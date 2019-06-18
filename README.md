@@ -30,6 +30,10 @@ __`❍ npx ethereum-bridge -a 9 -H 127.0.0.1 -p 9545 --dev `__
 
 __`❍ truffle(develop)> test`__
 
+**8)** Open a _new_ console in the same directory & Start up the ÐApp:
+
+__`❍ npm run dev `__
+
 &nbsp;
 
 ## :camera: Passing Tests:
