@@ -30,7 +30,7 @@ __`❍ truffle(develop)> test`__
 
 ## :camera: Passing Tests:
 
-[The passing tests!](uptime-verification-test.jpg)
+![The passing tests](uptime-verification-test.jpg)
 
 &nbsp;
 
