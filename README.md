@@ -14,15 +14,19 @@ __`❍ cd uptime-verification && npm install`__
 
 __`❍ sudo npm install -g npx `__
 
-**4)** Launch Truffle:
+**4)** Compile the contract code using truffle:
+
+__`❍ truffle compile `__
+
+**5)** Launch Truffle:
 
 __`❍ npx truffle develop`__
 
-**5)** Open a _new_ console in the same directory & spool up the ethereum-bridge:
+**6)** Open a _new_ console in the same directory & spool up the ethereum-bridge:
 
 __`❍ npx ethereum-bridge -a 9 -H 127.0.0.1 -p 9545 --dev `__
 
-**6)** Once the bridge is ready & listening, go back to the first console with Truffle running & set the tests going!
+**7)** Once the bridge is ready & listening, go back to the first console with Truffle running & set the tests going!
 
 __`❍ truffle(develop)> test`__
 
