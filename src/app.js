@@ -1,6 +1,6 @@
 // // Import the page's CSS. Webpack will know what to do with it, 
 // // as it's been configured by truffle-webpack
-import './stylesheets/app.css';
+import './app.css';
 
 const Web3 = require('web3')
 const web3 = new Web3(new Web3.providers.HttpProvider("http://127.0.0.1:9545"))
