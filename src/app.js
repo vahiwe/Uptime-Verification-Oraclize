@@ -14,3 +14,12 @@ const contract = new web3.eth.Contract(abi, address)
 contract.getPastEvents('NewOffTimeValue',{fromBlock: 0,toBlock: 'latest'},(err, events) => { va = events[0].returnValues[0] ; console.log(va); document.getElementById('total').innerHTML = va; })
 
 web3.eth.personal.getAccounts().then(function(value){console.log(value[0]); web3.eth.getBalance(value[0], (err, wei) => {var balance = web3.utils.fromWei(wei, 'ether'); console.log(balance); document.getElementById('balance').innerHTML = parseFloat(balance).toFixed(6)}) })
+
+function refresh() {
+    contract.getPastEvents('NewOffTimeValue',{fromBlock: 0,toBlock: 'latest'},(err, events) => { va = events[0].returnValues[0] ; console.log(va); document.getElementById('total').innerHTML = va; })
+
+    web3.eth.personal.getAccounts().then(function(value){console.log(value[0]); web3.eth.getBalance(value[0], (err, wei) => {var balance = web3.utils.fromWei(wei, 'ether'); console.log(balance); document.getElementById('balance').innerHTML = parseFloat(balance).toFixed(6)}) })
+
+}
+
+setInterval(function () {refresh();}, 30000)
