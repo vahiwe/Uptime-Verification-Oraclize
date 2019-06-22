@@ -44,10 +44,15 @@ contract UptimeVerification is usingOraclize{
     /// @notice Update the uptime value by running the Oracle service
     // Emit the appropriate event
   function update() public payable {
+        // Check if we have enough remaining funds
+        if (oraclize_getPrice("URL") > address(this).balance) {
+          emit NewOraclizeQuery("Oraclize query was NOT sent, please add some ETH to cover for the query fee");
+        } else {
           emit NewOraclizeQuery("Oraclize query was sent, standing by for the answer...");
           //oraclize_query("URL", "json(https://api.thingspeak.com/channels/800450/fields/6/last.json).field6");
           // Using XPath to to fetch the right element in the XML response
           oraclize_query("URL", "xml(https://api.thingspeak.com/channels/800450/fields/6/last.xml).feed.field6");
+        }
   }
 
 }
