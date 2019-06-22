@@ -21,7 +21,7 @@ contract UptimeVerification is usingOraclize{
   //
 
   // Counstructor
-  constructor() public payable{
+  constructor() public payable {
         owner = msg.sender;
         emit LogUpdate(owner, address(this).balance);
         OAR = OraclizeAddrResolverI(0x6f485C8BF6fc43eA212E93BBF8ce046C7f1cb475);
