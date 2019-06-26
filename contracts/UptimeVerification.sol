@@ -26,8 +26,8 @@ contract UptimeVerification is usingOraclize{
     //
     // Modifiers
     //
-    modifier isOwner{ require(msg.sender == owner); _;}
-    modifier isRegistered{ require(registerStatus[msg.sender] == true); _;}
+    modifier isOwner{require(msg.sender == owner, "Message Sender should be the owner of the contract"); _;}
+    modifier isRegistered{require(registerStatus[msg.sender] == true, "Message Sender should be registered"); _;}
 
     //
     // Functions
