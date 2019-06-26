@@ -7,14 +7,25 @@ contract UptimeVerification is usingOraclize{
     /** Owner of contract */
     address public owner;
 
-    /** Registration Status of Address */
-    mapping(address => bool) registerStatus;
+    /** Caller of Update function */
+    address caller;
+
+    /** Registration Status of Customer */
+    mapping(address => Customer) customerStatus;
 
     /** An Oracle call returns a query. Map to Boolean to check if it has been called earlier */
     mapping(bytes32=>bool) pendingQueries;
 
     /** Set returned Oracle call to offTimeValue */
     uint public offTimeValue;
+
+    /** Create a struct named Customer.
+    *   Here, add Registration Status and call status
+    */
+    struct Customer {
+        bool registerStatus;
+        bool callerStatus;
+    }
 
     //
     // Events - publicize actions to external listeners
@@ -27,7 +38,7 @@ contract UptimeVerification is usingOraclize{
     // Modifiers
     //
     modifier isOwner{require(msg.sender == owner, "Message Sender should be the owner of the contract"); _;}
-    modifier isRegistered{require(registerStatus[msg.sender] == true, "Message Sender should be registered"); _;}
+    modifier isRegistered(address _address){ require(customerStatus[_address].registerStatus == true); _;}
 
     //
     // Functions
@@ -36,7 +47,7 @@ contract UptimeVerification is usingOraclize{
     // Counstructor
     constructor() public payable {
         owner = msg.sender;
-        registerStatus[owner] = true;
+        customerStatus[owner].registerStatus = true;
         emit LogUpdate(owner, address(this).balance);
         OAR = OraclizeAddrResolverI(0x6f485C8BF6fc43eA212E93BBF8ce046C7f1cb475);
         update(); // Update views on contract creation...
@@ -63,8 +74,9 @@ contract UptimeVerification is usingOraclize{
 
     /// @notice Transfer ether to Customer if contract is breached
     function debitisp() public payable {
-        require(msg.value > 0 && msg.value == 5000000, "Check value of debit amount to be equal to 5000000");
-        msg.sender.transfer(msg.value);
+        require(customerStatus[caller].registerStatus == true && customerStatus[caller].callerStatus == true, "Check value of debit amount to be equal to 5000000");
+        address(uint160(caller)).transfer(5000000);
+        customerStatus[caller].callerStatus == false;
     }
 
     /// @notice Get balance of Customer account
@@ -74,19 +86,21 @@ contract UptimeVerification is usingOraclize{
 
     /// @notice Check registration Status of Customer
     function registrationStatus() public view returns (bool _stat) {
-        return registerStatus[msg.sender];
+        return customerStatus[msg.sender].registerStatus;
     }
 
     /// @notice Register customer
     //  Can only be carried out by owner of contract
     function registerCustomer (address _address) public isOwner {
-        registerStatus[_address] = true;
+        customerStatus[_address].registerStatus = true;
     }
 
     /// @notice Update the uptime value by running the Oracle service
     //  Emit the appropriate event
     //  Can only be called by a registered customer
-    function update() public payable isRegistered {
+    function update() public payable isRegistered(msg.sender) {
+        caller = msg.sender;
+        customerStatus[caller].callerStatus = true;
         // Check if we have enough remaining funds
         if (oraclize_getPrice("URL") > address(this).balance) {
             emit NewOraclizeQuery("Oraclize query was NOT sent, please add some ETH to cover for the query fee");
