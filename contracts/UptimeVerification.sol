@@ -10,6 +10,9 @@ contract UptimeVerification is usingOraclize{
     /** Caller of Update function */
     address caller;
 
+    /** Check if update has been called */
+    bool updateCalled;
+
     /** Registration Status of Customer */
     mapping(address => Customer) customerStatus;
 
@@ -38,7 +41,11 @@ contract UptimeVerification is usingOraclize{
     // Modifiers
     //
     modifier isOwner{require(msg.sender == owner, "Message Sender should be the owner of the contract"); _;}
-    modifier isRegistered(address _address){ require(customerStatus[_address].registerStatus == true); _;}
+    modifier isRegistered(address _address){require(customerStatus[_address].registerStatus == true, "Require address to be registered"); _;}
+    modifier isUpdateNotCalled{require(updateCalled == false, "Check if update has been called, False check"); _;}
+    modifier isUpdateCalled{require(updateCalled == true, "Check if update has been called, True check"); _;}
+    modifier isCallerNull{require(caller == address(0x0), "Check if caller address is Null"); _;}
+    modifier isCallerNotNull{require(caller != address(0x0), "Check if caller address is Not Null"); _;}
 
     //
     // Functions
@@ -65,22 +72,25 @@ contract UptimeVerification is usingOraclize{
         if(offTimeValue > 77){
             this.debitisp();
         }
-    }
-
-    /// @notice Get balance of contract
-    function getBalance() public view returns (uint _balance) {
-        return address(this).balance;
+        updateCalled = false;
+        customerStatus[caller].callerStatus == false;
+        caller = address(0x0);
     }
 
     /// @notice Transfer ether to Customer if contract is breached
-    function debitisp() public payable {
-        require(customerStatus[caller].registerStatus == true && customerStatus[caller].callerStatus == true, "Check value of debit amount to be equal to 5000000");
+    function debitisp() public payable isUpdateCalled isCallerNotNull {
+        require(customerStatus[caller].registerStatus == true, "Check if caller is registered");
+        require(customerStatus[caller].callerStatus == true, "Check if caller has called the update function");
         address(uint160(caller)).transfer(5000000);
-        customerStatus[caller].callerStatus == false;
+    }
+
+    /// @notice Get balance of contract
+    function getBalance() public view isRegistered(msg.sender) returns (uint _balance) {
+        return address(this).balance;
     }
 
     /// @notice Get balance of Customer account
-    function getCustomerBalance() public view returns (uint _balance) {
+    function getCustomerBalance() public view isRegistered(msg.sender) returns (uint _balance) {
         return msg.sender.balance;
     }
 
@@ -98,18 +108,19 @@ contract UptimeVerification is usingOraclize{
     /// @notice Update the uptime value by running the Oracle service
     //  Emit the appropriate event
     //  Can only be called by a registered customer
-    function update() public payable isRegistered(msg.sender) {
-        caller = msg.sender;
-        customerStatus[caller].callerStatus = true;
+    function update() public payable isRegistered(msg.sender) isUpdateNotCalled isCallerNull {
         // Check if we have enough remaining funds
         if (oraclize_getPrice("URL") > address(this).balance) {
             emit NewOraclizeQuery("Oraclize query was NOT sent, please add some ETH to cover for the query fee");
         } else {
+            updateCalled = true;
             emit NewOraclizeQuery("Oraclize query was sent, standing by for the answer...");
             //oraclize_query("URL", "json(https://api.thingspeak.com/channels/800450/fields/6/last.json).field6");
             // Using XPath to to fetch the right element in the XML response
             bytes32 queryId = oraclize_query("URL", "xml(https://api.thingspeak.com/channels/800450/fields/6/last.xml).feed.field6");
             pendingQueries[queryId] = true;
+            caller = msg.sender;
+            customerStatus[caller].callerStatus = true;
         }
     }
 
