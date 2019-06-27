@@ -28,6 +28,7 @@ contract UptimeVerification is usingOraclize{
     struct Customer {
         bool registerStatus;
         bool callerStatus;
+        uint256 callTime;
     }
 
     //
@@ -46,6 +47,7 @@ contract UptimeVerification is usingOraclize{
     modifier isUpdateCalled{require(updateCalled == true, "Check if update has been called, True check"); _;}
     modifier isCallerNull{require(caller == address(0x0), "Check if caller address is Null"); _;}
     modifier isCallerNotNull{require(caller != address(0x0), "Check if caller address is Not Null"); _;}
+    modifier allowUpdate(address _address){require(now >= (customerStatus[_address].callTime) + 5 minutes, "5 minutes has passed since last update call"); _;}
 
     //
     // Functions
@@ -108,19 +110,20 @@ contract UptimeVerification is usingOraclize{
     /// @notice Update the uptime value by running the Oracle service
     //  Emit the appropriate event
     //  Can only be called by a registered customer
-    function update() public payable isRegistered(msg.sender) isUpdateNotCalled isCallerNull {
+    function update() public payable isRegistered(msg.sender) isUpdateNotCalled isCallerNull allowUpdate(msg.sender) {
         // Check if we have enough remaining funds
         if (oraclize_getPrice("URL") > address(this).balance) {
             emit NewOraclizeQuery("Oraclize query was NOT sent, please add some ETH to cover for the query fee");
         } else {
             updateCalled = true;
+            caller = msg.sender;
+            customerStatus[caller].callerStatus = true;
+            customerStatus[caller].callTime = now;
             emit NewOraclizeQuery("Oraclize query was sent, standing by for the answer...");
             //oraclize_query("URL", "json(https://api.thingspeak.com/channels/800450/fields/6/last.json).field6");
             // Using XPath to to fetch the right element in the XML response
             bytes32 queryId = oraclize_query("URL", "xml(https://api.thingspeak.com/channels/800450/fields/6/last.xml).feed.field6");
             pendingQueries[queryId] = true;
-            caller = msg.sender;
-            customerStatus[caller].callerStatus = true;
         }
     }
 
