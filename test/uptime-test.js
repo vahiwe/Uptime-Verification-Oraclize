@@ -71,5 +71,14 @@ const {
         assert.isTrue('Update transaction succeeded!')
       } catch (e) {}
     })
+
+    it('Owner of Contract should be registered', async () => {
+        const regStatus = await methods.registrationStatus().call({from: address,gas: gasAmt})
+        assert.strictEqual(
+          regStatus,
+          true,
+          'Owner of account not registered'
+        )
+      })
   })
   

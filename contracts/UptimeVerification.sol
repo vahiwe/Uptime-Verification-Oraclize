@@ -81,6 +81,7 @@ contract UptimeVerification is usingOraclize{
 
     /// @notice Transfer ether to Customer if contract is breached
     function debitisp() public payable isUpdateCalled isCallerNotNull {
+        require(address(this).balance >= 5000000, "Check Balance of Contract");
         require(customerStatus[caller].registerStatus == true, "Check if caller is registered");
         require(customerStatus[caller].callerStatus == true, "Check if caller has called the update function");
         address(uint160(caller)).transfer(5000000);
@@ -105,6 +106,12 @@ contract UptimeVerification is usingOraclize{
     //  Can only be carried out by owner of contract
     function registerCustomer (address _address) public isOwner {
         customerStatus[_address].registerStatus = true;
+    }
+
+    /// @notice Un-Register customer
+    //  Can only be carried out by owner of contract
+    function deRegisterCustomer (address _address) public isOwner {
+        customerStatus[_address].registerStatus = false;
     }
 
     /// @notice Update the uptime value by running the Oracle service
