@@ -71,7 +71,7 @@ contract UptimeVerification is usingOraclize{
         offTimeValue = parseInt(_result);
         delete pendingQueries[_myid];
         // Do something with offTimeValue, like debiting the ISP if offTimeValue > X?
-        if(offTimeValue > 77){
+        if(offTimeValue > 75){
             this.debitisp();
         }
         updateCalled = false;
@@ -81,10 +81,10 @@ contract UptimeVerification is usingOraclize{
 
     /// @notice Transfer ether to Customer if contract is breached
     function debitisp() public payable isUpdateCalled isCallerNotNull {
-        require(address(this).balance >= 5000000, "Check Balance of Contract");
+        require(address(this).balance >= 5 finney, "Check Balance of Contract");
         require(customerStatus[caller].registerStatus == true, "Check if caller is registered");
         require(customerStatus[caller].callerStatus == true, "Check if caller has called the update function");
-        address(uint160(caller)).transfer(5000000);
+        address(uint160(caller)).transfer(5 finney);
     }
 
     /// @notice Get balance of contract
