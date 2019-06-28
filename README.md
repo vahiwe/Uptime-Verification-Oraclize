@@ -46,4 +46,10 @@ __`❍ npm run dev `__
 
 &nbsp;
 
+## :globe_with_meridians: ÐApp Homepage:
+
+![ÐApp Homepage](homepage.jpg)
+
+&nbsp;
+
 __*Happy developing!*__
