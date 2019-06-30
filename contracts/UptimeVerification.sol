@@ -23,7 +23,7 @@ contract UptimeVerification is usingOraclize{
     uint public offTimeValue;
 
     /** Create a struct named Customer.
-    *   Here, add Registration Status and call status
+    *   Here, add Registration Status, call status and call time
     */
     struct Customer {
         bool registerStatus;
@@ -47,7 +47,7 @@ contract UptimeVerification is usingOraclize{
     modifier isUpdateCalled{require(updateCalled == true, "Check if update has been called, True check"); _;}
     modifier isCallerNull{require(caller == address(0x0), "Check if caller address is Null"); _;}
     modifier isCallerNotNull{require(caller != address(0x0), "Check if caller address is Not Null"); _;}
-    modifier allowUpdate(address _address){require(now >= (customerStatus[_address].callTime) + 5 minutes, "5 minutes has passed since last update call"); _;}
+    modifier allowUpdate(address _address){require(now >= (customerStatus[_address].callTime) + 2 minutes, "2 minutes has passed since last update call"); _;}
 
     //
     // Functions
@@ -80,6 +80,9 @@ contract UptimeVerification is usingOraclize{
     }
 
     /// @notice Transfer ether to Customer if contract is breached
+    /// @notice 1 finney = 10e15
+    /// @notice Contract balance should be more than 5 finney
+    /// @notice Caller registration status and caller status should be set to True
     function debitisp() public payable isUpdateCalled isCallerNotNull {
         require(address(this).balance >= 5 finney, "Check Balance of Contract");
         require(customerStatus[caller].registerStatus == true, "Check if caller is registered");
@@ -88,28 +91,32 @@ contract UptimeVerification is usingOraclize{
     }
 
     /// @notice Get balance of contract
+    /// @return _balance The balance of the contract
     function getBalance() public view isRegistered(msg.sender) returns (uint _balance) {
         return address(this).balance;
     }
 
     /// @notice Get balance of Customer account
+    //  Can only be called by a Registered Customer
+    /// @return _balance The balance of the registered msg.sender
     function getCustomerBalance() public view isRegistered(msg.sender) returns (uint _balance) {
         return msg.sender.balance;
     }
 
     /// @notice Check registration Status of Customer
+    /// @return _stat The registration status of the msg.sender
     function registrationStatus() public view returns (bool _stat) {
         return customerStatus[msg.sender].registerStatus;
     }
 
     /// @notice Register customer
-    //  Can only be carried out by owner of contract
+    //  Can only be called by owner of contract
     function registerCustomer (address _address) public isOwner {
         customerStatus[_address].registerStatus = true;
     }
 
     /// @notice Un-Register customer
-    //  Can only be carried out by owner of contract
+    //  Can only be called by owner of contract
     function deRegisterCustomer (address _address) public isOwner {
         customerStatus[_address].registerStatus = false;
     }
@@ -117,6 +124,8 @@ contract UptimeVerification is usingOraclize{
     /// @notice Update the uptime value by running the Oracle service
     //  Emit the appropriate event
     //  Can only be called by a registered customer
+    //  Modifier checks if update has been called by another Registered customer and prevents another call
+    //  Modifier checks if 2 minutes has passed since last call from msg.sender who is a registered customer
     function update() public payable isRegistered(msg.sender) isUpdateNotCalled isCallerNull allowUpdate(msg.sender) {
         // Check if we have enough remaining funds
         if (oraclize_getPrice("URL") > address(this).balance) {
@@ -127,7 +136,6 @@ contract UptimeVerification is usingOraclize{
             customerStatus[caller].callerStatus = true;
             customerStatus[caller].callTime = now;
             emit NewOraclizeQuery("Oraclize query was sent, standing by for the answer...");
-            //oraclize_query("URL", "json(https://api.thingspeak.com/channels/800450/fields/6/last.json).field6");
             // Using XPath to to fetch the right element in the XML response
             bytes32 queryId = oraclize_query("URL", "xml(https://api.thingspeak.com/channels/800450/fields/6/last.xml).feed.field6");
             pendingQueries[queryId] = true;
