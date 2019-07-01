@@ -24,6 +24,17 @@
 // const fs = require('fs');
 // const mnemonic = fs.readFileSync(".secret").toString().trim();
 
+// Create a secrets.json file that holds your mnemonic and
+// your Infura API Key
+const HDWalletProvider = require('truffle-hdwallet-provider');
+const fs = require('fs');
+
+let secrets;
+
+if (fs.existsSync('secrets.json')) {
+ secrets = JSON.parse(fs.readFileSync('secrets.json', 'utf8'));
+}
+
 module.exports = {
 
   plugins: ["truffle-security"],
@@ -51,6 +62,18 @@ module.exports = {
      network_id: "*",       // Any network (default: none)
      websockets: true,
      gas:500000,
+    },
+
+    rinkeby: {
+        provider: new HDWalletProvider(secrets.mnemonic, 'https://rinkeby.infura.io/v3/'+secrets.infuraApiKey),
+        network_id: '4',
+        skipDryRun: true,
+    },
+
+    ropsten: {
+        provider: new HDWalletProvider(secrets.mnemonic, 'https://ropsten.infura.io/v3/'+secrets.infuraApiKey),
+        network_id: '3',
+        skipDryRun: true,
     },
 
     // Another network with more advanced options...

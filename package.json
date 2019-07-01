@@ -9,6 +9,7 @@
   "dependencies": {
     "copy-webpack-plugin": "^5.0.3",
     "ethereum-bridge": "^0.6.2",
+    "truffle-hdwallet-provider": "^1.0.12",
     "truffle-security": "^1.5.1",
     "web3": "^1.0.0-beta.36",
     "webpack": "^4.34.0",
