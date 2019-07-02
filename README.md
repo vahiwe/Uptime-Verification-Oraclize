@@ -4,11 +4,11 @@ This repo is to demonstrate how an Oraclize smart-contract is used in managing a
 
 **1)** Fire up your favourite console & clone this repo somewhere:
 
-__`❍ git clone https://github.com/vahiwe/uptime-verification.git`__
+__`❍ git clone https://github.com/vahiwe/Uptime-Verification-Oraclize.git`__
 
 **2)** Enter this directory & install dependencies:
 
-__`❍ cd uptime-verification && npm install`__
+__`❍ cd Uptime-Verification-Oraclize && npm install`__
 
 **3)** Install npx if not already installed:
 
