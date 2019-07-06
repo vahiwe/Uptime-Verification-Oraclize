@@ -52,4 +52,11 @@ __`❍ npm run dev `__
 
 &nbsp;
 
+## :information_source: Links:
+
+* Click [here](https://youtu.be/na_UsrvnQfw) to view a video on setting up the system
+* This is a [link](https://twitter.com/PROFXELFINITO/status/1141230082226364416?s=19) to images of the IoT Device used in keeping record of time
+
+&nbsp;
+
 __*Happy developing!*__
