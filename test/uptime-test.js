@@ -21,16 +21,16 @@ const {
       )
     ))
   
-    it('Should have logged a new Oraclize query', async () => {
+    it('Should have logged a new Provable query', async () => {
       const {
         returnValues: {
           description
         }
-      } = await waitForEvent(events.NewOraclizeQuery)
+      } = await waitForEvent(events.NewProvableQuery)
       assert.strictEqual(
         description,
-        'Oraclize query was sent, standing by for the answer...',
-        'Oraclize query incorrectly logged!'
+        'Provable query was sent, standing by for the answer...',
+        'Provable query incorrectly logged!'
       )
     })
   

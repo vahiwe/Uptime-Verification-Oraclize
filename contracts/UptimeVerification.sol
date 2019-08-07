@@ -1,8 +1,8 @@
 pragma solidity ^0.5.0;
-import "./oraclizeAPI.sol";
+import "./provableAPI.sol";
 
 
-contract UptimeVerification is usingOraclize{
+contract UptimeVerification is usingProvable{
 
     /** Owner of contract */
     address public owner;
@@ -34,7 +34,7 @@ contract UptimeVerification is usingOraclize{
     //
     // Events - publicize actions to external listeners
     //
-    event NewOraclizeQuery(string description);
+    event NewProvableQuery(string description);
     event NewOffTimeValue(string value);
     event LogUpdate(address indexed _owner, uint indexed _balance);
 
@@ -58,14 +58,13 @@ contract UptimeVerification is usingOraclize{
         owner = msg.sender;
         customerStatus[owner].registerStatus = true;
         emit LogUpdate(owner, address(this).balance);
-        OAR = OraclizeAddrResolverI(0x6f485C8BF6fc43eA212E93BBF8ce046C7f1cb475);
         update(); // Update views on contract creation...
     }
 
     /// @notice Callback function
     // Emit the appropriate event
     function __callback(bytes32 _myid, string memory _result) public {
-        require(msg.sender == oraclize_cbAddress(), "Message sender should be equal to contract address");
+        require(msg.sender == provable_cbAddress(), "Message sender should be equal to contract address");
         require(pendingQueries[_myid] == true, "This should be an already emitted ID");
         emit NewOffTimeValue(_result);
         offTimeValue = parseInt(_result);
@@ -121,23 +120,23 @@ contract UptimeVerification is usingOraclize{
         customerStatus[_address].registerStatus = false;
     }
 
-    /// @notice Update the uptime value by running the Oracle service
+    /// @notice Update the uptime value by running the Provable service
     //  Emit the appropriate event
     //  Can only be called by a registered customer
     //  Modifier checks if update has been called by another Registered customer and prevents another call
     //  Modifier checks if 2 minutes has passed since last call from msg.sender who is a registered customer
     function update() public payable isRegistered(msg.sender) isUpdateNotCalled isCallerNull allowUpdate(msg.sender) {
         // Check if we have enough remaining funds
-        if (oraclize_getPrice("URL") > address(this).balance) {
-            emit NewOraclizeQuery("Oraclize query was NOT sent, please add some ETH to cover for the query fee");
+        if (provable_getPrice("URL") > address(this).balance) {
+            emit NewProvableQuery("Provable query was NOT sent, please add some ETH to cover for the query fee");
         } else {
             updateCalled = true;
             caller = msg.sender;
             customerStatus[caller].callerStatus = true;
             customerStatus[caller].callTime = now;
-            emit NewOraclizeQuery("Oraclize query was sent, standing by for the answer...");
+            emit NewProvableQuery("Provable query was sent, standing by for the answer...");
             // Using XPath to to fetch the right element in the XML response
-            bytes32 queryId = oraclize_query("URL", "xml(https://api.thingspeak.com/channels/800450/fields/6/last.xml).feed.field6");
+            bytes32 queryId = provable_query("URL", "xml(https://api.thingspeak.com/channels/800450/fields/6/last.xml).feed.field6");
             pendingQueries[queryId] = true;
         }
     }
