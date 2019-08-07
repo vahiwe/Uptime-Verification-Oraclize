@@ -42,7 +42,7 @@ __`❍ npm run dev `__
 
 ## :camera: Passing Tests:
 
-![The passing tests](uptime-verification-test.jpg)
+![The passing tests](uptime-verification-test.png)
 
 &nbsp;
 
