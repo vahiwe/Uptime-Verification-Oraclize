@@ -12,7 +12,7 @@
     "truffle-hdwallet-provider": "^1.0.12",
     "truffle-security": "^1.5.1",
     "web3": "^1.0.0-beta.36",
-    "webpack": "^4.34.0",
+    "webpack": "^5.94.0",
     "webpack-cli": "^3.3.4",
     "webpack-dev-server": "^3.7.1"
   },
